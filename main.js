@@ -1326,4 +1326,18 @@ function guardarDatosJuego(nombre, campana, movimientos, tiempo) {
     fetch("guardar_datos.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    })}
+        body: `nombre=${encodeURIComponent(nombre)}&campana=${encodeURIComponent(campana)}&movimientos=${movimientos}&tiempo=${tiempo}`
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log("Respuesta del servidor:", data);
+        if (!data.includes("✅")) {
+            alert("Datos guardados correctamente ");
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Hubo un error al guardar los datos. Por favor, inténtalo de nuevo.");
+    });
+}
+

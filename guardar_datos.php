@@ -1,34 +1,24 @@
 <?php
-include 'conexion.php';
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    include("conexion.php");
 
-// Verificar si se recibieron los datos
-if (!isset($_POST['nombre']) || !isset($_POST['campana']) || !isset($_POST['movimientos']) || !isset($_POST['tiempo'])) {
-    echo "❌ Error: Datos incompletos";
-    exit;
-}
+    // Sanitizar y obtener valores
+    $nombre = $conn->real_escape_string($_POST["nombre"]);
+    $campana = $conn->real_escape_string($_POST["campana"]);
+    $movimientos = (int)$_POST["movimientos"];
+    $tiempo = (int)$_POST["tiempo"];
 
-$nombre = $_POST['nombre'];
-$campana = $_POST['campana'];
-$movimientos = $_POST['movimientos'];
-$tiempo = $_POST['tiempo'];
+    $sql = "INSERT INTO resultados (nombre, campana, movimientos, tiempo) 
+            VALUES ('$nombre', '$campana', $movimientos, $tiempo)";
 
-// Depuración - mostrar los datos recibidos
-echo "Datos recibidos: <br>";
-echo "Nombre: " . $nombre . "<br>";
-echo "Campaña: " . $campana . "<br>";
-echo "Movimientos: " . $movimientos . "<br>";
-echo "Tiempo: " . $tiempo . "<br>";
+    if ($conn->query($sql) === TRUE) {
+        echo "✅ Datos guardados correctamente";
+    } else {
+        echo "❌ Error al guardar: " . $conn->error;
+    }
 
-$sql = "INSERT INTO jugadores (nombre, campana, movimientos, tiempo) VALUES (?, ?, ?, ?)";
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("ssii", $nombre, $campana, $movimientos, $tiempo);
-
-if ($stmt->execute()) {
-    echo "✅ Datos guardados correctamente";
+    $conn->close();
 } else {
-    echo "❌ Error al guardar los datos: " . $stmt->error;
+    echo "❌ Método no permitido";
 }
-
-$stmt->close();
-$conexion->close();
 ?>
